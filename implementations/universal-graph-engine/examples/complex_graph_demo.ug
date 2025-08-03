@@ -1,0 +1,145 @@
+# Universal Graph Engine - Complex Graph Demonstration
+# 
+# This script demonstrates advanced graph manipulation capabilities:
+# - Social network with intermediate nodes
+# - Knowledge graph with bridging concepts
+# - Workflow with error handling paths
+# - Multi-level triangular connections
+#
+# Run with: ./ug_cli -f complex_graph_demo.ug
+
+# ============================================================================
+# Social Network with Intermediate Connections
+# ============================================================================
+
+# Create people
+node alice "Alice Smith - Software Engineer"
+node bob "Bob Johnson - Data Scientist" 
+node charlie "Charlie Brown - Product Manager"
+node diana "Diana Prince - UX Designer"
+node eve "Eve Wilson - DevOps Engineer"
+
+# Create initial relationships
+edge alice bob COLLEAGUES 0.8
+edge bob charlie TEAM_MEMBERS 0.9
+edge charlie diana COLLABORATES 0.7
+edge diana eve FRIENDS 0.6
+
+# Insert intermediary connections (mutual contacts, shared projects, etc.)
+insert alice bob project_alpha "Project Alpha (shared work)"
+insert charlie diana design_review "Design Review Process"
+insert bob eve data_pipeline "Data Pipeline Project"
+
+# Create triangular connections (group formations)
+triangle alice charlie scrum_team "Daily Scrum Team"
+triangle bob diana analytics_group "Analytics Working Group"
+triangle alice eve infrastructure "Infrastructure Team"
+
+# ============================================================================
+# Knowledge Graph with Bridging Concepts
+# ============================================================================
+
+# Create foundational concepts
+node mathematics "Mathematics - Foundation of Science"
+node statistics "Statistics - Data Analysis"
+node probability "Probability Theory"
+node machine_learning "Machine Learning"
+node ai "Artificial Intelligence"
+node data_science "Data Science"
+
+# Create knowledge relationships
+edge mathematics statistics FOUNDATION_OF 1.0
+edge mathematics probability INCLUDES 0.9
+edge probability statistics ENABLES 0.8
+edge statistics machine_learning PREREQUISITE_FOR 0.9
+edge machine_learning ai COMPONENT_OF 0.8
+
+# Insert bridging concepts between major fields
+insert mathematics machine_learning linear_algebra "Linear Algebra (bridge concept)"
+insert statistics ai bayesian_methods "Bayesian Methods"
+insert probability data_science stochastic_processes "Stochastic Processes"
+
+# Create interdisciplinary triangles
+triangle statistics machine_learning deep_learning "Deep Learning (fusion field)"
+triangle probability ai reinforcement_learning "Reinforcement Learning"
+triangle mathematics data_science optimization "Mathematical Optimization"
+
+# ============================================================================
+# Complex Workflow with Error Handling
+# ============================================================================
+
+# Create process nodes
+node start_process "Initialize System"
+node validate_input "Input Validation"
+node process_data "Data Processing"
+node analyze_results "Result Analysis"
+node generate_output "Output Generation"
+node end_process "Process Complete"
+
+# Create main workflow
+edge start_process validate_input NEXT 1.0
+edge validate_input process_data VALID 1.0
+edge process_data analyze_results SUCCESS 1.0
+edge analyze_results generate_output APPROVED 1.0
+edge generate_output end_process FINISHED 1.0
+
+# Insert error handling and monitoring nodes
+insert validate_input process_data error_logger "Error Logging System"
+insert process_data analyze_results quality_check "Quality Assurance Check"
+insert analyze_results generate_output approval_gate "Management Approval"
+
+# Create monitoring and support triangles
+triangle start_process validate_input monitoring "System Monitoring"
+triangle process_data analyze_results backup_system "Backup & Recovery"
+triangle generate_output end_process notification "Completion Notification"
+
+# ============================================================================
+# Multi-level Academic Hierarchy
+# ============================================================================
+
+# Create academic levels
+node undergraduate "Undergraduate Studies"
+node graduate "Graduate Studies"
+node phd "PhD Research"
+node postdoc "Post-Doctoral Research"
+node faculty "Faculty Position"
+
+# Create progression path
+edge undergraduate graduate ADVANCES_TO 0.7
+edge graduate phd CONTINUES_TO 0.4
+edge phd postdoc LEADS_TO 0.6
+edge postdoc faculty RESULTS_IN 0.3
+
+# Insert bridging experiences
+insert undergraduate graduate internship "Industry Internship"
+insert graduate phd thesis_research "Master's Thesis Research"
+insert phd postdoc dissertation "PhD Dissertation Defense"
+insert postdoc faculty publications "Research Publications"
+
+# Create support system triangles
+triangle undergraduate graduate mentorship "Academic Mentorship"
+triangle graduate phd research_group "Research Group Participation"
+triangle phd postdoc collaboration "Academic Collaboration Network"
+triangle postdoc faculty tenure_track "Tenure Track Process"
+
+# ============================================================================
+# Display Results
+# ============================================================================
+
+# Show comprehensive statistics
+stats
+
+# List all nodes to see the complex structure
+nodes
+
+# Show help for the advanced commands we used
+help insert
+help triangle
+
+# Final message
+# echo "Complex graph demonstration complete!"
+# echo "Created multi-domain graph with:"
+# echo "- Social network with intermediate connections"
+# echo "- Knowledge graph with bridging concepts" 
+# echo "- Workflow with error handling"
+# echo "- Academic progression with support systems"

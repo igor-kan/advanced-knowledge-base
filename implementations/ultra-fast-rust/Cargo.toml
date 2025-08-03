@@ -1,0 +1,110 @@
+[package]
+name = "ultra-fast-knowledge-graph"
+version = "0.1.0"
+edition = "2021"
+authors = ["Igor Kan <igor@example.com>"]
+description = "Ultra-high-performance knowledge graph database built for billions of nodes/edges"
+license = "MIT"
+repository = "https://github.com/igor-kan/advanced-knowledge-base"
+
+[dependencies]
+# Core performance dependencies
+tokio = { version = "1.35", features = ["full", "parking_lot"] }
+rayon = "1.8"                    # Data parallelism
+crossbeam = "0.8"               # Lock-free data structures
+parking_lot = "0.12"            # High-performance locks
+dashmap = "5.5"                 # Concurrent hash map
+atomic = "0.6"                  # Atomic operations
+bytemuck = "1.14"               # Zero-copy type conversions
+
+# Memory management and performance
+mimalloc = { version = "0.1", default-features = false }
+bumpalo = "3.14"                # Bump allocator for fast allocation
+typed-arena = "2.0"             # Arena allocator
+smallvec = "1.11"               # Stack-allocated vectors
+
+# Serialization and compression
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"                 # Fast binary serialization
+lz4_flex = "0.11"              # Fast compression
+zstd = "0.13"                   # High compression ratio
+
+# Storage backends
+rocksdb = { version = "0.21", optional = true }
+sled = { version = "0.34", optional = true }
+redb = { version = "1.5", optional = true }
+
+# Network and API
+tonic = "0.10"                  # gRPC
+prost = "0.12"                  # Protocol buffers
+hyper = { version = "0.14", features = ["full"] }
+axum = "0.7"                    # Web framework
+
+# Hashing and indexing
+ahash = "0.8"                   # Fast hashing
+fxhash = "0.2"                  # Fast hash for small keys
+roaring = "0.10"                # Compressed bitmaps
+bloom = "0.3"                   # Bloom filters
+
+# Math and algorithms
+nalgebra = "0.32"               # Linear algebra
+ndarray = "0.15"                # N-dimensional arrays
+petgraph = "0.6"                # Graph algorithms (for reference)
+
+# SIMD and low-level optimization
+wide = "0.7"                    # SIMD types
+byteorder = "1.5"               # Byte order utilities
+memmap2 = "0.9"                 # Memory-mapped files
+
+# Metrics and monitoring
+metrics = "0.21"
+metrics-exporter-prometheus = "0.12"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# FFI for C++/Assembly integration
+cc = "1.0"                      # C++ compilation
+cxx = "1.0"                     # Safe C++ bindings
+
+# GPU acceleration (optional)
+cudarc = { version = "0.10", optional = true }
+candle-core = { version = "0.3", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+once_cell = "1.19"
+
+[features]
+default = ["rocksdb", "simd", "metrics"]
+rocksdb = ["dep:rocksdb"]
+sled = ["dep:sled"] 
+redb = ["dep:redb"]
+gpu = ["cudarc", "candle-core"]
+simd = []
+metrics = []
+distributed = []
+
+[profile.release]
+lto = "fat"                     # Link-time optimization
+codegen-units = 1              # Single codegen unit for maximum optimization
+panic = "abort"                # Smaller binary size
+opt-level = 3                  # Maximum optimization
+overflow-checks = false        # Disable overflow checks for speed
+debug = false                  # No debug info in release
+
+[profile.bench]
+inherits = "release"
+debug = true                   # Keep debug info for profiling
+
+[[bench]]
+name = "graph_operations"
+harness = false
+
+[[bench]]
+name = "traversal_benchmark"
+harness = false
+
+[[bench]]
+name = "bulk_operations"
+harness = false

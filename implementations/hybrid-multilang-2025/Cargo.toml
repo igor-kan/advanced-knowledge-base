@@ -1,0 +1,130 @@
+[package]
+name = "hybrid-knowledge-graph-2025"
+version = "1.0.0"
+edition = "2021"
+description = "Ultra-high performance hybrid multi-language knowledge graph engine"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/example/hybrid-kg"
+keywords = ["knowledge-graph", "performance", "multi-language", "rust", "graph-database"]
+
+[lib]
+name = "hybrid_kg"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "kg-benchmark"
+path = "src/bin/benchmark.rs"
+
+[[bin]]
+name = "kg-server"
+path = "src/bin/server.rs"
+
+[dependencies]
+# Async runtime and concurrency
+tokio = { version = "1.35", features = ["full", "tracing"] }
+rayon = "1.8"
+crossbeam = "0.8"
+parking_lot = "0.12"
+
+# Data structures and algorithms
+ndarray = { version = "0.15", features = ["blas"] }
+petgraph = "0.6"
+dashmap = "5.5"
+indexmap = "2.1"
+roaring = "0.10"
+
+# Serialization and I/O
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+memmap2 = "0.9"
+
+# FFI and interop
+libc = "0.2"
+cxx = "1.0"
+safer-ffi = "0.1"
+
+# Numerical computing
+nalgebra = "0.32"
+approx = "0.5"
+num-traits = "0.2"
+
+# Logging and monitoring
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+metrics = "0.21"
+metrics-exporter-prometheus = "0.12"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Memory management
+jemalloc = { version = "0.5", features = ["profiling"], optional = true }
+
+# Optional CUDA support
+cudarc = { version = "0.10", optional = true }
+
+# Optional SIMD optimizations
+wide = { version = "0.7", optional = true }
+
+[build-dependencies]
+cc = { version = "1.0", features = ["parallel"] }
+cmake = "0.1"
+bindgen = "0.69"
+cxx-build = "1.0"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tempfile = "3.8"
+
+[features]
+default = ["simd", "parallel", "jemalloc"]
+
+# Performance features
+simd = ["wide"]
+parallel = ["rayon"]
+gpu = ["cudarc"]
+jemalloc = ["dep:jemalloc"]
+
+# Language integration features
+cpp-backend = []
+fortran-numerics = []
+c-system = []
+
+# Development features
+profiling = ["jemalloc/profiling"]
+debug = []
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+debug-assertions = false
+
+[profile.bench]
+inherits = "release"
+debug = true
+
+[profile.dev]
+opt-level = 1
+
+# Custom optimization for hot paths
+[profile.release.package.hybrid-knowledge-graph-2025]
+opt-level = 3
+codegen-units = 1
+lto = true
+
+[[bench]]
+name = "graph_operations"
+harness = false
+
+[[bench]]
+name = "multilang_integration"
+harness = false
+
+[package.metadata.docs.rs]
+features = ["simd", "parallel", "gpu"]
+rustdoc-args = ["--cfg", "docsrs"]

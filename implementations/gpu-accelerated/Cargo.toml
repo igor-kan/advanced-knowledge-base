@@ -1,0 +1,266 @@
+[package]
+name = "gpu-accelerated-kg"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ultra-Fast Knowledge Graph Team"]
+license = "MIT"
+description = "GPU-accelerated ultra-high performance knowledge graph database with CUDA integration"
+repository = "https://github.com/igor-kan/advanced-knowledge-base"
+keywords = ["graph", "database", "gpu", "cuda", "performance"]
+categories = ["database", "algorithms", "data-structures", "science"]
+
+[lib]
+name = "gpu_accelerated_kg"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "gpu-kg-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "gpu-kg-benchmark"
+path = "src/bin/benchmark.rs"
+
+[[bin]]
+name = "gpu-kg-profiler"
+path = "src/bin/profiler.rs"
+
+[dependencies]
+# Core GPU and parallel computing
+cudarc = { version = "0.11", features = ["std", "cublas", "curand", "cusparse", "cufft"] }
+candle-core = { version = "0.6", features = ["cuda"] }
+candle-nn = "0.6"
+tch = { version = "0.16", features = ["cuda"] }
+
+# High-performance Rust libraries
+tokio = { version = "1.35", features = ["full"] }
+rayon = "1.8"
+crossbeam = "0.8"
+parking_lot = "0.12"
+dashmap = "5.5"
+ahash = "0.8"
+smallvec = "1.11"
+tinyvec = "1.6"
+once_cell = "1.19"
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Serialization and data handling
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+rmp-serde = "1.1"
+
+# Memory management optimized for GPU
+mimalloc = { version = "0.1", default-features = false }
+jemalloc-ctl = "0.5"
+
+# SIMD and low-level optimizations
+wide = "0.7"
+bytemuck = { version = "1.14", features = ["derive"] }
+memchr = "2.6"
+bstr = "1.7"
+
+# Async and networking
+hyper = { version = "1.0", features = ["full"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["full"] }
+
+# Compression and I/O
+lz4 = "1.24"
+zstd = "0.13"
+memmap2 = "0.9"
+
+# Metrics and monitoring
+prometheus = "0.13"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Math and algorithms optimized for GPU
+nalgebra = { version = "0.32", features = ["cuda"] }
+ndarray = { version = "0.15", features = ["blas"] }
+statrs = "0.16"
+faer = "0.18"
+
+# GPU-specific linear algebra
+cublas-sys = "0.1"
+cusparse-sys = "0.1"
+curand-sys = "0.1"
+
+# Graph processing libraries
+petgraph = "0.6"
+graph = "0.7"
+
+# Development and testing dependencies
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+gpu-allocator = "0.26"
+
+[features]
+default = ["cuda", "simd", "jemalloc"]
+
+# GPU acceleration features
+cuda = ["cudarc/std", "candle-core/cuda", "tch/cuda"]
+rocm = [] # AMD ROCm support (future)
+opencl = [] # OpenCL support (future)
+
+# Performance features
+simd = []
+jemalloc = ["mimalloc/secure"]
+distributed = []
+
+# Development and debugging features
+profiling = []
+benchmarks = ["serde_json", "criterion"]
+testing = []
+debug-gpu = [] # GPU debugging and validation
+
+[profile.release]
+# Maximum optimization for GPU kernels
+opt-level = 3
+debug = false
+strip = true
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+
+# GPU-specific optimizations
+[profile.release.package."*"]
+opt-level = 3
+codegen-units = 1
+
+[profile.gpu-release]
+inherits = "release"
+# Even more aggressive optimization for GPU code
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+
+[profile.bench]
+opt-level = 3
+debug = true
+lto = "thin"
+codegen-units = 16
+overflow-checks = false
+
+[build-dependencies]
+cc = "1.0"
+bindgen = "0.69"
+pkg-config = "0.3"
+cuda-config = "0.1"
+
+# Platform-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+nix = "0.28"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3", features = ["processthreadsapi", "memoryapi", "sysinfoapi"] }
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+core_arch = "0.1"
+
+# CUDA toolkit configuration
+[package.metadata.cuda]
+toolkit_version = "12.3"
+compute_capability = ["8.0", "8.6", "8.9", "9.0"] # RTX 3000+, RTX 4000+, RTX 4090, RTX 5000+
+ptx_version = "7.8"
+enable_fast_math = true
+enable_ftz = true # Flush denormals to zero
+enable_prec_div = false # Fast division
+enable_prec_sqrt = false # Fast square root
+
+# cuGraph integration
+[package.metadata.cugraph]
+version = "24.02"
+algorithms = [
+    "bfs", "dfs", "sssp", "pagerank", "triangle_counting",
+    "connected_components", "strongly_connected_components",
+    "betweenness_centrality", "eigenvector_centrality",
+    "louvain", "leiden", "spectral_clustering"
+]
+
+# GPU memory management
+[package.metadata.gpu-memory]
+pool_size_gb = 16 # Default GPU memory pool
+enable_unified_memory = true
+enable_memory_pools = true
+enable_async_allocation = true
+
+# Benchmarking configuration
+[[bench]]
+name = "gpu_algorithms"
+harness = false
+required-features = ["cuda", "benchmarks"]
+
+[[bench]]
+name = "gpu_memory_transfer"
+harness = false
+required-features = ["cuda"]
+
+[[bench]]
+name = "gpu_vs_cpu_comparison"
+harness = false
+required-features = ["cuda", "benchmarks"]
+
+# Example configurations
+[[example]]
+name = "gpu_basic_operations"
+path = "examples/basic_gpu_ops.rs"
+required-features = ["cuda"]
+
+[[example]]
+name = "gpu_pagerank_demo"
+path = "examples/pagerank_demo.rs"
+required-features = ["cuda"]
+
+[[example]]
+name = "gpu_large_scale_analytics"
+path = "examples/large_scale_analytics.rs"
+required-features = ["cuda", "profiling"]
+
+[[example]]
+name = "multi_gpu_distributed"
+path = "examples/multi_gpu.rs"
+required-features = ["cuda", "distributed"]
+
+# Documentation configuration
+[package.metadata.docs.rs]
+features = ["cuda", "simd", "distributed"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+# Cargo configuration for GPU optimization
+[package.metadata.build]
+cuda-arch = ["sm_80", "sm_86", "sm_89", "sm_90"] # RTX 3000+ architectures
+cuda-flags = [
+    "--use_fast_math",
+    "--ftz=true", # Flush denormals to zero
+    "--prec-div=false", # Fast division
+    "--prec-sqrt=false", # Fast square root
+    "--fmad=true", # Fused multiply-add
+    "-O3", # Maximum optimization
+    "--ptxas-options=-v" # Verbose PTX assembly
+]
+
+# Security and licensing
+[package.metadata.security]
+audit-level = "strict"
+vulnerability-checks = true
+gpu-security-checks = true
+
+[package.metadata.license]
+license-file = "LICENSE"
+copyright = "2025 Ultra-Fast Knowledge Graph Team"
+
+# CI/CD configuration for GPU testing
+[package.metadata.ci]
+gpu-testing = true
+cuda-docker-image = "nvidia/cuda:12.3-devel-ubuntu22.04"
+required-gpu-memory = "8GB"
+test-gpus = ["RTX 3080", "RTX 4090", "A100", "H100"]

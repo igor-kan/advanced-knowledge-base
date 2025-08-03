@@ -1,0 +1,39 @@
+# Universal Graph Engine CLI Demo Script
+# 
+# This script demonstrates the CLI capabilities including:
+# - Creating nodes and edges
+# - Inserting nodes between existing connections
+# - Creating triangular connections
+# - Basic graph analysis
+#
+# Run with: ./ug_cli -f cli_demo.ug
+
+# Create some initial nodes
+node alice "Alice Smith"
+node bob "Bob Johnson" 
+node charlie "Charlie Brown"
+node diana "Diana Prince"
+
+# Create some basic edges
+edge alice bob KNOWS 0.8
+edge bob charlie FRIENDS 0.9
+edge charlie diana WORKS_WITH 0.7
+
+# Show current state
+stats
+nodes
+
+# Insert a node between Alice and Bob
+# This will remove the direct connection and create: Alice -> David -> Bob
+insert alice bob david "David Wilson"
+
+# Create a triangle: Eve connects to both Charlie and Diana
+triangle charlie diana eve "Eve connects to both"
+
+# Show final state
+stats
+nodes
+
+# Display help for specific commands
+help insert
+help triangle

@@ -1,0 +1,116 @@
+# Universal Graph Engine CLI - Basic Tutorial
+#
+# This tutorial introduces the fundamental concepts and commands
+# for creating and manipulating graphs using the CLI.
+#
+# Run with: ./ug_cli -f tutorial_basic.ug
+
+# ============================================================================
+# Lesson 1: Creating Your First Nodes
+# ============================================================================
+
+# Create simple nodes with just names
+node alice
+node bob
+node charlie
+
+# Create nodes with descriptive data
+node diana "Diana Prince - Designer"
+node eve "Eve Wilson - Engineer"
+
+# Create nodes with different data types
+node counter 42
+node temperature 98.6
+node is_active true
+
+# See what we've created
+nodes
+
+# ============================================================================
+# Lesson 2: Connecting Nodes with Edges  
+# ============================================================================
+
+# Create basic connections
+edge alice bob
+edge bob charlie
+
+# Create typed connections with weights
+edge diana eve COLLABORATES 0.8
+edge alice diana KNOWS 0.6
+edge charlie eve FRIENDS 0.9
+
+# Show graph statistics
+stats
+
+# ============================================================================
+# Lesson 3: Advanced Connection Patterns
+# ============================================================================
+
+# INSERT: Place a node between two connected nodes
+# This will break the direct alice->bob connection
+# and create: alice -> bridge -> bob
+insert alice bob bridge "Bridge Connection"
+
+# Show the change
+stats
+nodes
+
+# TRIANGLE: Create a node that connects to two others
+# This creates a triangular pattern where the new node
+# connects to both existing nodes
+triangle diana eve coordinator "Project Coordinator"
+
+# ============================================================================
+# Lesson 4: Working with Properties
+# ============================================================================
+
+# Set properties on nodes (when implemented)
+# set alice age 28
+# set alice city "New York"
+# set bob skills "Python,SQL,Docker"
+
+# Get properties (when implemented)  
+# get alice age
+# get bob skills
+
+# ============================================================================
+# Lesson 5: Graph Analysis
+# ============================================================================
+
+# Find neighbors of a node (when implemented)
+# neighbors alice
+# neighbors alice 2
+
+# Find paths between nodes (when implemented)
+# path alice eve
+# path bridge coordinator
+
+# ============================================================================
+# Lesson 6: Visualization and Export
+# ============================================================================
+
+# Visualize the graph structure
+viz
+
+# Export to different formats (when implemented)
+# export dot my_graph.dot
+# export json my_graph.json
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+# Display final statistics
+stats
+
+# Show all nodes we created
+nodes
+
+# This tutorial covered:
+# - Creating nodes with different data types
+# - Basic and typed edge connections
+# - INSERT operation for intermediate nodes
+# - TRIANGLE operation for multi-connections
+# - Graph analysis and visualization
+#
+# Next: Try tutorial_advanced.ug for complex graph patterns!

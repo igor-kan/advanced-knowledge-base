@@ -1,0 +1,253 @@
+[package]
+name = "hybrid-ultra-fast-kg"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ultra-Fast Knowledge Graph Team"]
+license = "MIT"
+description = "Hybrid Rust+C++/Assembly ultra-high performance knowledge graph database"
+repository = "https://github.com/igor-kan/advanced-knowledge-base"
+keywords = ["graph", "database", "simd", "performance", "knowledge-graph"]
+categories = ["database", "algorithms", "data-structures"]
+
+[lib]
+name = "hybrid_ultra_fast_kg"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "hybrid-kg-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "hybrid-kg-benchmark"
+path = "src/bin/benchmark.rs"
+
+[dependencies]
+# Core Rust dependencies for safety and performance
+tokio = { version = "1.35", features = ["full"] }
+rayon = "1.8"
+crossbeam = "0.8"
+parking_lot = "0.12"
+dashmap = "5.5"
+ahash = "0.8"
+smallvec = "1.11"
+tinyvec = "1.6"
+once_cell = "1.19"
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Serialization and data handling
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+rmp-serde = "1.1"
+
+# Memory management and allocation
+mimalloc = { version = "0.1", default-features = false }
+jemalloc-ctl = "0.5"
+
+# SIMD and low-level optimizations
+wide = "0.7"
+bytemuck = { version = "1.14", features = ["derive"] }
+memchr = "2.6"
+bstr = "1.7"
+
+# Async and networking
+hyper = { version = "1.0", features = ["full"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["full"] }
+
+# Compression and I/O
+lz4 = "1.24"
+zstd = "0.13"
+memmap2 = "0.9"
+
+# Metrics and monitoring
+prometheus = "0.13"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Math and algorithms
+nalgebra = "0.32"
+ndarray = "0.15"
+statrs = "0.16"
+
+# FFI for C++ integration
+cxx = "1.0"
+cc = "1.0"
+
+# Optional GPU support
+cudarc = { version = "0.11", optional = true }
+
+# Development and testing dependencies
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+
+[features]
+default = ["simd", "jemalloc"]
+
+# Performance features
+simd = []
+gpu = ["cudarc"]
+distributed = []
+jemalloc = ["mimalloc/secure"]
+
+# Development features
+profiling = []
+benchmarks = []
+testing = []
+
+[profile.release]
+# Maximum optimization for production use
+opt-level = 3
+debug = false
+strip = true
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+
+# Specific optimizations for different targets
+[profile.release.package."*"]
+opt-level = 3
+codegen-units = 1
+
+# Profile for development with some optimizations
+[profile.dev-optimized]
+inherits = "dev"
+opt-level = 2
+debug = true
+overflow-checks = true
+
+# Profile for benchmarking
+[profile.bench]
+opt-level = 3
+debug = true
+lto = "thin"
+codegen-units = 16
+overflow-checks = false
+
+[build-dependencies]
+cxx-build = "1.0"
+cc = "1.0"
+bindgen = "0.69"
+pkg-config = "0.3"
+
+# Platform-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3", features = ["processthreadsapi", "memoryapi"] }
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+# x86_64 specific SIMD intrinsics
+core_arch = "0.1"
+
+# Workspace configuration for hybrid implementation
+[workspace]
+resolver = "2"
+members = [
+    ".",
+    "crates/hybrid-core",
+    "crates/hybrid-cpp-bridge", 
+    "crates/hybrid-asm-kernels",
+    "crates/hybrid-simd",
+    "crates/hybrid-storage",
+    "crates/hybrid-algorithms",
+    "crates/hybrid-query",
+    "crates/hybrid-distributed"
+]
+
+# Ensure consistent dependency versions across workspace
+[workspace.dependencies]
+tokio = { version = "1.35", features = ["full"] }
+rayon = "1.8"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Cargo configuration for build optimization
+[package.metadata.docs.rs]
+features = ["simd", "distributed"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+# Binary optimization
+[[bin]]
+name = "hybrid-kg-cli"
+path = "src/bin/cli.rs"
+required-features = ["simd"]
+
+# Assembly kernel integration
+[package.metadata.asm-kernels]
+kernels = [
+    "src/asm/avx512_bfs.S",
+    "src/asm/avx512_pagerank.S", 
+    "src/asm/avx512_distance_update.S",
+    "src/asm/avx512_matrix_mult.S"
+]
+
+# C++ bridge configuration
+[package.metadata.cxx-bridge]
+bridges = [
+    "src/bridge/storage_bridge.rs",
+    "src/bridge/algorithm_bridge.rs",
+    "src/bridge/simd_bridge.rs"
+]
+
+# Benchmark configuration
+[[bench]]
+name = "hybrid_benchmarks"
+harness = false
+required-features = ["benchmarks"]
+
+[[bench]]
+name = "simd_benchmarks" 
+harness = false
+required-features = ["simd", "benchmarks"]
+
+[[bench]]
+name = "storage_benchmarks"
+harness = false
+
+# Example configurations
+[[example]]
+name = "hybrid_basic_usage"
+path = "examples/basic_usage.rs"
+required-features = ["simd"]
+
+[[example]]
+name = "hybrid_advanced_queries"
+path = "examples/advanced_queries.rs"
+required-features = ["simd", "distributed"]
+
+[[example]]
+name = "hybrid_performance_demo"
+path = "examples/performance_demo.rs"
+required-features = ["simd", "profiling"]
+
+# Custom build configuration for maximum performance
+[package.metadata.build]
+cpp-std = "c++23"
+asm-flags = ["-mavx512f", "-mavx512cd", "-mavx512vl", "-mavx512bw", "-mavx512dq"]
+link-flags = ["-flto", "-march=native", "-mtune=native"]
+optimization-level = "3"
+
+# Documentation configuration
+[package.metadata.docs]
+include-private = false
+include-benchmarks = true
+include-examples = true
+
+# Security and licensing
+[package.metadata.security]
+audit-level = "strict"
+vulnerability-checks = true
+
+[package.metadata.license]
+license-file = "LICENSE"
+copyright = "2025 Ultra-Fast Knowledge Graph Team"
