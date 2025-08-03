@@ -1,0 +1,149 @@
+# Social Network Graph Example
+#
+# This example demonstrates building a complex social network
+# using the Universal Graph Engine CLI with intermediate nodes
+# and triangular connections to model real-world relationships.
+#
+# Run with: ./ug_cli -f social_network.ug
+
+# ============================================================================
+# Create Core People
+# ============================================================================
+
+node alice "Alice Johnson - Software Engineer at TechCorp"
+node bob "Bob Smith - Data Scientist at DataFlow Inc"
+node charlie "Charlie Brown - Product Manager at InnovateCorp"
+node diana "Diana Prince - UX Designer at DesignHub"
+node eve "Eve Wilson - DevOps Engineer at CloudSys"
+node frank "Frank Miller - CEO at StartupXYZ"
+node grace "Grace Lee - Marketing Director at BrandBoost"
+node henry "Henry Davis - Sales Manager at SalesForce Pro"
+
+# ============================================================================
+# Basic Professional Relationships
+# ============================================================================
+
+# Direct colleagues and professional connections
+edge alice bob COLLEAGUES 0.8
+edge bob charlie TEAM_MEMBERS 0.9
+edge charlie diana COLLABORATES 0.7
+edge diana eve WORKS_WITH 0.6
+edge eve frank REPORTS_TO 0.5
+edge frank grace MANAGES 0.8
+edge grace henry COORDINATES_WITH 0.7
+
+# Cross-team relationships
+edge alice diana CROSS_FUNCTIONAL 0.6
+edge bob eve TECHNICAL_PEERS 0.7
+edge charlie frank STRATEGIC_ALIGNMENT 0.8
+
+# ============================================================================
+# Insert Intermediate Connections (Shared Projects/Contexts)
+# ============================================================================
+
+# Insert shared projects between direct connections
+insert alice bob project_alpha "Project Alpha - ML Pipeline"
+insert charlie diana ux_research "UX Research Initiative"
+insert eve frank infrastructure_upgrade "Cloud Infrastructure Upgrade"
+insert grace henry sales_campaign "Q4 Sales Campaign"
+
+# Insert meeting/process intermediaries  
+insert bob charlie sprint_planning "Agile Sprint Planning"
+insert diana eve design_system "Design System Development"
+insert alice diana accessibility_review "Accessibility Review Process"
+
+# ============================================================================
+# Create Team/Group Triangular Connections
+# ============================================================================
+
+# Engineering team triangle
+triangle alice bob tech_lead "Technical Lead (connects engineering)"
+
+# Product development triangle  
+triangle bob charlie product_owner "Product Owner (bridges data & product)"
+
+# Design collaboration triangle
+triangle charlie diana design_thinking "Design Thinking Workshop Leader"
+
+# Operations team triangle
+triangle diana eve ops_coordinator "Operations Coordinator"
+
+# Executive team triangle
+triangle eve frank cto "CTO (technical executive bridge)"
+
+# Business team triangle
+triangle frank grace business_development "Business Development Lead"
+
+# Customer-facing triangle
+triangle grace henry customer_success "Customer Success Manager"
+
+# ============================================================================
+# Create Cross-Functional Working Groups
+# ============================================================================
+
+# Create nodes that connect across traditional boundaries
+triangle alice charlie fullstack_architect "Full-Stack Architect"
+triangle bob diana data_visualization "Data Visualization Specialist"
+triangle alice eve platform_engineer "Platform Engineering Lead"
+triangle charlie frank strategy_consultant "Strategy Consultant"
+triangle diana henry user_advocate "User Experience Advocate"
+
+# ============================================================================
+# Social/Personal Connections Layer
+# ============================================================================
+
+# Add personal friendship layer (lighter connections)
+edge alice grace FRIENDS 0.4
+edge bob henry FRIENDS 0.3
+edge charlie eve FRIENDS 0.5
+edge diana frank MENTORSHIP 0.6
+
+# Insert social intermediaries
+insert alice grace book_club "Tech Book Club"
+insert bob henry gaming_group "After-work Gaming Group"
+insert charlie eve hiking_club "Weekend Hiking Club"
+
+# Create social triangles
+triangle alice grace social_coordinator "Social Event Coordinator"
+triangle bob henry sports_team "Company Sports Team Captain"
+
+# ============================================================================
+# Knowledge Sharing Network
+# ============================================================================
+
+# Create expertise-sharing connections
+triangle alice bob knowledge_sharing "Technical Knowledge Sharing Lead"
+triangle diana grace creative_collaboration "Creative Collaboration Hub"
+triangle eve henry process_improvement "Process Improvement Champion"
+
+# ============================================================================
+# Display Results
+# ============================================================================
+
+# Show comprehensive network statistics
+stats
+
+# List all people in the network
+nodes
+
+# Visualize the complex social network
+viz
+
+# Show help for the commands we used
+help insert
+help triangle
+
+# Final summary message
+# echo ""
+# echo "Social Network Created Successfully!"
+# echo "=================================="
+# echo "Features demonstrated:"
+# echo "- Core professional relationships"
+# echo "- Shared projects as intermediate nodes"
+# echo "- Team leaders as triangle connectors"
+# echo "- Cross-functional working groups"
+# echo "- Social/personal connection layer"
+# echo "- Knowledge sharing networks"
+# echo ""
+# echo "This network shows how INSERT and TRIANGLE operations"
+# echo "can model complex real-world social structures!"

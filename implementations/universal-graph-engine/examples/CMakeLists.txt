@@ -34,9 +34,13 @@ install(TARGETS infinite_complexity_demo statistical_knowledge_graph
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/examples
 )
 
-# Install source files for reference
+# Install source files and scripts for reference
 install(FILES 
     infinite_complexity_demo.c
     statistical_knowledge_graph.c
+    cli_demo.ug
+    complex_graph_demo.ug
+    tutorial_basic.ug
+    social_network.ug
     DESTINATION ${CMAKE_INSTALL_DOCDIR}/examples
 )

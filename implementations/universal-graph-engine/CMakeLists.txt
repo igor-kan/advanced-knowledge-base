@@ -280,6 +280,7 @@ if(UG_BUILD_CLI)
     set(UG_CLI_SOURCES
         src/cli/main.c
         src/cli/ug_cli.c
+        src/cli/ug_cli_visualization.c
     )
     
     # Create CLI executable
