@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Graph Engine - Visual Interface</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Universal Graph Engine</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="toolbar">
+                    <button class="tool-btn active" id="select-tool" data-tool="select" title="Select Tool (S)">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </button>
+                    <button class="tool-btn" id="node-tool" data-tool="node" title="Add Node (N)">
+                        <i class="fas fa-circle"></i>
+                    </button>
+                    <button class="tool-btn" id="edge-tool" data-tool="edge" title="Add Edge (E)">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="tool-btn" id="insert-tool" data-tool="insert" title="Insert Node Between (I)">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                    <button class="tool-btn" id="triangle-tool" data-tool="triangle" title="Create Triangle (T)">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button class="tool-btn" id="zoom-in" title="Zoom In (+)">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="tool-btn" id="zoom-out" title="Zoom Out (-)">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="tool-btn" id="fit-view" title="Fit to View (F)">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-secondary" id="export-btn">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+                <button class="btn-primary" id="save-btn">
+                    <i class="fas fa-save"></i>
+                    Save
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Graph Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number" id="node-count">0</span>
+                            <span class="stat-label">Nodes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="edge-count">0</span>
+                            <span class="stat-label">Edges</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="density">0.00</span>
+                            <span class="stat-label">Density</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Node Properties</h3>
+                    <div id="node-properties" class="properties-panel">
+                        <div class="no-selection">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <p>Click a node to edit its properties</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Graph Controls</h3>
+                    <div class="controls-panel">
+                        <div class="control-group">
+                            <label>Layout Algorithm</label>
+                            <select id="layout-select">
+                                <option value="force">Force Directed</option>
+                                <option value="circular">Circular</option>
+                                <option value="hierarchical">Hierarchical</option>
+                                <option value="grid">Grid</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Animation Speed</label>
+                            <input type="range" id="animation-speed" min="0.1" max="2" step="0.1" value="1">
+                            <span id="speed-value">1.0x</span>
+                        </div>
+                        <div class="control-group">
+                            <button class="btn-secondary full-width" id="clear-graph">
+                                <i class="fas fa-trash"></i>
+                                Clear Graph
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Canvas Area -->
+            <div class="canvas-container">
+                <div class="canvas-wrapper">
+                    <svg id="graph-canvas" class="graph-canvas">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                    refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                            </marker>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge> 
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f1f5f9" stroke-width="1"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        <g id="graph-container">
+                            <g id="edges-group"></g>
+                            <g id="nodes-group"></g>
+                        </g>
+                    </svg>
+                    
+                    <!-- Context Menu -->
+                    <div id="context-menu" class="context-menu">
+                        <div class="menu-item" data-action="edit">
+                            <i class="fas fa-edit"></i>
+                            Edit Node
+                        </div>
+                        <div class="menu-item" data-action="connect">
+                            <i class="fas fa-link"></i>
+                            Connect to...
+                        </div>
+                        <div class="menu-item" data-action="insert">
+                            <i class="fas fa-plus-circle"></i>
+                            Insert Node Between
+                        </div>
+                        <div class="menu-item" data-action="triangle">
+                            <i class="fas fa-play"></i>
+                            Create Triangle
+                        </div>
+                        <div class="menu-separator"></div>
+                        <div class="menu-item" data-action="delete">
+                            <i class="fas fa-trash"></i>
+                            Delete Node
+                        </div>
+                    </div>
+
+                    <!-- Tool Instructions -->
+                    <div id="tool-instructions" class="tool-instructions">
+                        <div class="instruction" data-tool="select">
+                            <strong>Select Tool:</strong> Click nodes to select, drag to move, right-click for menu
+                        </div>
+                        <div class="instruction" data-tool="node">
+                            <strong>Add Node:</strong> Click anywhere to create a new node
+                        </div>
+                        <div class="instruction" data-tool="edge">
+                            <strong>Add Edge:</strong> Click first node, then click second node to connect them
+                        </div>
+                        <div class="instruction" data-tool="insert">
+                            <strong>Insert Node:</strong> Click an edge to insert a node between the connected nodes
+                        </div>
+                        <div class="instruction" data-tool="triangle">
+                            <strong>Create Triangle:</strong> Click an edge to create a triangular connection
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <!-- Node Edit Modal -->
+        <div id="node-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Node</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="node-label">Label</label>
+                        <input type="text" id="node-label" placeholder="Node label">
+                    </div>
+                    <div class="form-group">
+                        <label for="node-description">Description</label>
+                        <textarea id="node-description" placeholder="Add notes or description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="node-color">Color</label>
+                        <div class="color-picker">
+                            <input type="color" id="node-color" value="#3b82f6">
+                            <div class="color-presets">
+                                <div class="color-preset" data-color="#3b82f6"></div>
+                                <div class="color-preset" data-color="#ef4444"></div>
+                                <div class="color-preset" data-color="#10b981"></div>
+                                <div class="color-preset" data-color="#f59e0b"></div>
+                                <div class="color-preset" data-color="#8b5cf6"></div>
+                                <div class="color-preset" data-color="#ec4899"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="node-size">Size</label>
+                        <input type="range" id="node-size" min="20" max="80" value="40">
+                        <span id="size-value">40px</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-edit">Cancel</button>
+                    <button class="btn-primary" id="save-node">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Modal -->
+        <div id="connection-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create Connection</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Connect to:</label>
+                        <div id="available-nodes" class="node-list">
+                            <!-- Available nodes will be populated here -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edge-label">Relationship Type</label>
+                        <input type="text" id="edge-label" placeholder="e.g., KNOWS, RELATED_TO, PART_OF">
+                    </div>
+                    <div class="form-group">
+                        <label for="edge-weight">Weight</label>
+                        <input type="number" id="edge-weight" min="0" max="1" step="0.1" value="1.0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-connection">Cancel</button>
+                    <button class="btn-primary" id="create-connection">Create Connection</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="graph-engine.js"></script>
+    <script src="graph-ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
